@@ -101,17 +101,21 @@ h1 em{font-style:normal;color:var(--amber);}
 .board-head .title{font-family:var(--font-mono);font-size:0.78rem;letter-spacing:0.06em;text-transform:uppercase;color:rgba(246,243,236,0.6);}
 .board-head .clock{font-family:var(--font-mono);font-size:0.78rem;color:var(--amber);}
 .fleet-row{
-  display:grid;grid-template-columns:18px 1fr auto auto;gap:12px;align-items:center;
+  display:grid;grid-template-columns:18px minmax(0,1fr) auto;grid-template-areas:"dot name status" ". meta status";gap:2px 12px;align-items:center;
   padding:9px 0;border-bottom:1px solid rgba(246,243,236,0.08);font-size:0.86rem;
 }
+.fleet-row .dot{grid-area:dot;}
+.fleet-row .fleet-name{grid-area:name;}
+.fleet-row .fleet-meta{grid-area:meta;}
+.fleet-row .fleet-status{grid-area:status;align-self:center;}
 .fleet-row:last-child{border-bottom:none;}
 .dot{width:8px;height:8px;border-radius:50%;}
 .dot.ok{background:#6FCF97;box-shadow:0 0 0 3px rgba(111,207,151,0.18);}
 .dot.warn{background:var(--amber);box-shadow:0 0 0 3px rgba(232,169,59,0.18);}
 .dot.busy{background:#7BA6D9;box-shadow:0 0 0 3px rgba(123,166,217,0.18);}
-.fleet-name{font-weight:500;}
-.fleet-meta{font-family:var(--font-mono);font-size:0.78rem;color:rgba(246,243,236,0.55);}
-.fleet-status{font-family:var(--font-mono);font-size:0.76rem;text-align:right;color:rgba(246,243,236,0.75);}
+.fleet-name{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fleet-meta{font-family:var(--font-mono);font-size:0.78rem;color:rgba(246,243,236,0.55);white-space:nowrap;}
+.fleet-status{font-family:var(--font-mono);font-size:0.76rem;text-align:right;color:rgba(246,243,236,0.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;}
 .board-foot{
   margin-top:14px;padding-top:12px;border-top:1px solid rgba(246,243,236,0.14);
   display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:0.76rem;color:rgba(246,243,236,0.55);
@@ -274,6 +278,31 @@ table.demo-table td{padding:11px 10px;border-bottom:1px solid var(--line);}
 .ov-tile .ov-label{font-size:0.82rem;color:rgba(246,243,236,0.8);}
 .ov-tile .ov-open{display:inline-block;margin-top:12px;font-size:0.78rem;color:var(--amber);}
 
+/* School / parent access demo */
+.school-layout{display:grid;grid-template-columns:220px 1fr;gap:24px;}
+.school-kids{display:flex;flex-direction:column;gap:8px;}
+.school-kid-btn{
+  font-family:var(--font-mono);font-size:0.86rem;text-align:left;padding:11px 14px;
+  border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;color:var(--navy);
+}
+.school-kid-btn.active{background:var(--navy);color:var(--paper);border-color:var(--navy);}
+.school-subject-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);}
+.school-subject-row .subj-name{font-weight:500;font-size:0.92rem;}
+.subj-stat-block{padding:16px 0;border-bottom:1px solid var(--line);}
+.subj-stat-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+.subj-stat-head .subj-name{font-weight:600;font-size:0.95rem;color:var(--navy);}
+.delta-chip{font-family:var(--font-mono);font-size:0.76rem;padding:3px 10px;border-radius:999px;}
+.delta-chip.up{background:rgba(79,123,92,0.14);color:var(--sage);}
+.delta-chip.down{background:rgba(181,80,42,0.14);color:var(--danger);}
+.delta-chip.flat{background:var(--line);color:var(--steel);}
+.subj-bar-row{display:grid;grid-template-columns:46px 1fr 34px;align-items:center;gap:10px;margin-bottom:6px;font-family:var(--font-mono);font-size:0.74rem;color:var(--steel);}
+.bar-track{background:var(--line);border-radius:4px;height:9px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;}
+.bar-fill.start{background:var(--steel);opacity:0.5;}
+.bar-fill.now{background:var(--navy);}
+.bar-val{text-align:right;}
+@media (max-width:700px){.school-layout{grid-template-columns:1fr;}.school-kids{flex-direction:row;flex-wrap:wrap;}}
+
 /* Invoice/CRM demo */
 .crm-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:24px;}
 .crm-box{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:16px;}
@@ -357,9 +386,9 @@ table.demo-table td{padding:11px 10px;border-bottom:1px solid var(--line);}
   <div class="wrap">
     <section class="hero" style="border-top:none;">
       <div>
-        <div class="hero-eyebrow">Digitale Lösungen für kleine &amp; mittlere Betriebe</div>
-        <h1>Ihr Betrieb, <em>ein Programm</em> — statt zehn Excel-Tabellen.</h1>
-        <p class="lead">Zehn Excel-Tabellen, verstreute Zettel, Wartungstermine, die untergehen — das kostet jeden Tag Zeit und Nerven. Wir kennen dieses Chaos aus eigener Erfahrung im Handwerk und wissen, wie man es auflöst. Deshalb bauen wir kleineren Betrieben ohne eigene IT-Abteilung genau die Lösung, die zu ihren Abläufen passt: massgeschneiderte Software, Webdesign, Social-Media-Betreuung und Werbevideos — vier Bereiche aus einer Hand, damit Sie sich wieder auf Ihr Geschäft konzentrieren können. Schreiben Sie uns, und wir zeigen Ihnen, wie das für Ihren Betrieb aussehen könnte.</p>
+        <div class="hero-eyebrow">Digitale Lösungen für alles und jeden</div>
+        <h1>Sie wünschen es — <em>wir setzen es um</em>.</h1>
+        <p class="lead">Zehn Excel-Tabellen, verstreute Zettel, Termine, die untergehen — das kostet jeden Tag Zeit und Nerven. Wir kennen dieses Chaos aus eigener Erfahrung im Handwerk und wissen, wie man es auflöst. Ob Schreinerbetrieb, Coiffeursalon, Büro mit eigener Buchhaltung oder Bildungseinrichtung: Wir bauen die Lösung, die zu Ihrem Alltag passt — massgeschneiderte Software, Webdesign, Social-Media-Betreuung und Werbevideos, vier Bereiche aus einer Hand. Schreiben Sie uns, und wir zeigen Ihnen, wie das für Sie aussehen könnte.</p>
         <div class="cta-row">
           <button class="btn btn-primary" onclick="showPage('demos')">Demos ansehen</button>
           <a class="btn btn-ghost" href="mailto:vorburgerluc.p@gmail.com">Anfrage stellen</a>
@@ -382,7 +411,7 @@ table.demo-table td{padding:11px 10px;border-bottom:1px solid var(--line);}
       <div class="section-head">
         <div class="section-eyebrow">Leistungen</div>
         <h2>Vier Bereiche, ein Ansprechpartner.</h2>
-        <p>Die meisten kleinen Betriebe brauchen nicht vier verschiedene Anbieter, sondern jemanden, der alles zusammendenkt.</p>
+        <p>Die meisten brauchen nicht vier verschiedene Anbieter, sondern jemanden, der alles zusammendenkt.</p>
       </div>
       <div class="svc-grid">
         <div class="svc-card">
@@ -393,12 +422,12 @@ table.demo-table td{padding:11px 10px;border-bottom:1px solid var(--line);}
         <div class="svc-card">
           <div class="svc-num">02</div>
           <h3>Webdesign</h3>
-          <p>Eine Website, die zum Betrieb passt — vom ersten Auftritt bis zur Pflege danach.</p>
+          <p>Eine Website, die zu Ihnen passt — vom ersten Auftritt bis zur Pflege danach.</p>
         </div>
         <div class="svc-card">
           <div class="svc-num">03</div>
           <h3>Social Media</h3>
-          <p>Beratung und Umsetzung für Instagram, Facebook &amp; Co. — von der Strategie bis zum laufenden Betrieb.</p>
+          <p>Beratung und Umsetzung für Instagram, Facebook &amp; Co. — von der Strategie bis zum laufenden Betrieb der Kanäle.</p>
         </div>
         <div class="svc-card">
           <div class="svc-num">04</div>
@@ -412,7 +441,7 @@ table.demo-table td{padding:11px 10px;border-bottom:1px solid var(--line);}
       <div class="section-head">
         <div class="section-eyebrow">Das Problem</div>
         <h2>Übersicht entsteht nicht in Excel-Reitern.</h2>
-        <p>Kleinere Betriebe haben selten eine eigene IT-Abteilung — und Standardsoftware passt fast nie genau. Fuhrpark, Lager, Zeiterfassung oder Aufträge laufen über verstreute Tabellen und Zettel. Egal welcher Bereich: Wir bauen das Tool, das zu Ihren tatsächlichen Abläufen passt — nicht umgekehrt.</p>
+        <p>Vom Schreinerbetrieb über den Coiffeursalon bis zur Schule: Ohne eigene IT-Abteilung passt Standardsoftware fast nie genau, und es bleiben Excel-Tabellen und Zettel. Egal welcher Bereich: Wir bauen das Tool, das zu Ihrem Alltag passt — nicht umgekehrt.</p>
       </div>
     </section>
 
@@ -425,7 +454,7 @@ table.demo-table td{padding:11px 10px;border-bottom:1px solid var(--line);}
         <div class="process-step open"><span class="state">Offen</span><h3>Anfrage</h3><p>Sie schildern das Problem — vor Ort oder per Gespräch. Kein Formular, kein Pflichtenheft.</p></div>
         <div class="process-step open"><span class="state">Analyse</span><h3>Ist-Zustand</h3><p>Wir schauen uns Ihre heutigen Abläufe an: was wird wo erfasst, was fehlt, was kostet Zeit.</p></div>
         <div class="process-step build"><span class="state">In Arbeit</span><h3>Prototyp</h3><p>Ein erstes funktionierendes Tool, das Sie testen — nicht nur ein Konzept auf Papier.</p></div>
-        <div class="process-step live"><span class="state">Live</span><h3>Einsatz &amp; Support</h3><p>Das Tool läuft im Betrieb. Wir passen es weiter an, wenn sich Abläufe ändern.</p></div>
+        <div class="process-step live"><span class="state">Live</span><h3>Einsatz &amp; Support</h3><p>Das Tool läuft im Alltag. Wir passen es weiter an, wenn sich Abläufe ändern.</p></div>
       </div>
     </section>
 
@@ -433,7 +462,7 @@ table.demo-table td{padding:11px 10px;border-bottom:1px solid var(--line);}
       <div class="section-head">
         <div class="section-eyebrow">Und darüber hinaus</div>
         <h2>Fuhrpark ist nur der Anfang der Liste.</h2>
-        <p>Aus der Ausbildung zum Technischen Kaufmann bringen wir das betriebswirtschaftliche Rüstzeug mit, um Software für praktisch jeden Bereich Ihres Betriebs zu entwickeln:</p>
+        <p>Aus der Ausbildung zum Technischen Kaufmann bringen wir das betriebswirtschaftliche Rüstzeug mit, um Software für praktisch jeden Bereich zu entwickeln — egal ob Werkstatt, Salon, Büro oder Schule:</p>
       </div>
       <div class="ref-tags" style="margin-top:-8px;">
         <span style="border-color:var(--line);color:var(--steel);">Datensammlung mit automatischer Auswertung</span>
@@ -482,7 +511,7 @@ table.demo-table td{padding:11px 10px;border-bottom:1px solid var(--line);}
       </div>
     </section>
   </div>
-  <footer><div class="wrap">© 2026 Vorburger Solutions — Beratung &amp; Entwicklung für Fuhrpark- und Controlling-Software.</div></footer>
+  <footer><div class="wrap">© 2026 Vorburger Solutions — Digitale Lösungen für Handwerk, Gewerbe, Büro und Bildung.</div></footer>
 </div>
 
 <!-- ================= DEMOSEITE ================= -->
@@ -492,7 +521,7 @@ table.demo-table td{padding:11px 10px;border-bottom:1px solid var(--line);}
       <div class="section-head">
         <div class="section-eyebrow">Beispiele</div>
         <h2>Bausteine eines Ganzen — nicht sechs einzelne Tools.</h2>
-        <p>Fuhrpark, Lager, Aufträge, Personal, Kundenverwaltung, Buchhaltung — das sind keine sechs getrennten Demos, sondern Module eines einzigen Systems. Dieselbe Logik funktioniert für einen Handwerksbetrieb genauso wie für einen Coiffeursalon mit Terminen, Bestellungen und Kundenkartei. Jede Karte öffnet einen funktionierenden Baustein — kein Mockup-Bild, sondern bedienbare Demo-Ausschnitte. Die erste Karte zeigt, wie alle Module zusammen in einem Gesamtsystem laufen.</p>
+        <p>Fuhrpark, Lager, Aufträge, Personal, Kundenverwaltung, Buchhaltung, Bildung — das sind keine sieben getrennten Demos, sondern Module eines einzigen Systems. Dieselbe Logik funktioniert für einen Handwerksbetrieb genauso wie für einen Coiffeursalon, ein Büro mit eigener Buchhaltung oder eine Schule. Jede Karte öffnet einen funktionierenden Baustein — kein Mockup-Bild, sondern bedienbare Demo-Ausschnitte. Die erste Karte zeigt, wie alle Module zusammen in einem Gesamtsystem laufen.</p>
       </div>
     </section>
 
@@ -538,6 +567,12 @@ table.demo-table td{padding:11px 10px;border-bottom:1px solid var(--line);}
           <span class="tag">Personal</span>
           <h3>Mitarbeiter &amp; Ferienplanung</h3>
           <p>Ferientage pro Mitarbeiter im Blick — der Kalender warnt automatisch, wenn zu viele gleichzeitig abwesend sind.</p>
+          <span class="open-link">Demo öffnen →</span>
+        </div>
+        <div class="demo-card" data-demo="school">
+          <span class="tag">Bildung</span>
+          <h3>Lernstand &amp; Elternzugang</h3>
+          <p>Lehrperson und Eltern gemeinsam für die Förderung des Kindes — anonymisiert, mit sichtbarer Entwicklung statt Urteil.</p>
           <span class="open-link">Demo öffnen →</span>
         </div>
       </div>
@@ -631,7 +666,7 @@ table.demo-table td{padding:11px 10px;border-bottom:1px solid var(--line);}
         <div class="demo-panel-head">
           <div>
             <h3>Kunde anlegen → Rechnung auslösen</h3>
-            <p>Legen Sie einen Kunden und eine Leistung an, wählen Sie beide aus und lösen Sie die Rechnung aus. Funktioniert für Handwerk, Coiffeursalon oder jeden anderen Betrieb gleich.</p>
+            <p>Legen Sie einen Kunden und eine Leistung an, wählen Sie beide aus und lösen Sie die Rechnung aus. Funktioniert für Handwerk, Salon, Büro oder jeden anderen Bereich gleich.</p>
           </div>
           <button class="close-panel" onclick="closePanel('invoice')">← Zurück zur Übersicht</button>
         </div>
@@ -682,9 +717,24 @@ table.demo-table td{padding:11px 10px;border-bottom:1px solid var(--line);}
         <div class="emp-cal-title">August — Ferienkalender</div>
         <div class="emp-cal" id="empCal"></div>
       </div>
+
+      <!-- SCHOOL / PARENT ACCESS PANEL -->
+      <div class="demo-panel" id="panel-school">
+        <div class="demo-panel-head">
+          <div>
+            <h3>Lernstand &amp; Elternzugang</h3>
+            <p>Lehrperson und Eltern arbeiten zusammen, damit sich ein Kind optimal entwickeln kann — die Förderung steht an oberster Stelle. Die Daten sind anonymisiert, um die Privatsphäre des Kindes zu schützen. Pro Fach sehen Eltern die Entwicklung seit Schulbeginn.</p>
+          </div>
+          <button class="close-panel" onclick="closePanel('school')">← Zurück zur Übersicht</button>
+        </div>
+        <div class="school-layout">
+          <div class="school-kids" id="schoolKids"></div>
+          <div class="school-detail" id="schoolDetail"></div>
+        </div>
+      </div>
     </section>
   </div>
-  <footer><div class="wrap">© 2026 Vorburger Solutions — Beratung &amp; Entwicklung für Fuhrpark- und Controlling-Software.</div></footer>
+  <footer><div class="wrap">© 2026 Vorburger Solutions — Digitale Lösungen für Handwerk, Gewerbe, Büro und Bildung.</div></footer>
 </div>
 
 <script>
@@ -742,6 +792,7 @@ function openPanel(name){
   if(name==='orders') renderOrderTable('all');
   if(name==='invoice') { renderCustList(); renderItemList(); renderInvItemPicker(); }
   if(name==='staff') renderStaff();
+  if(name==='school') renderSchool();
   document.getElementById('panel-'+name).scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 function closePanel(name){
@@ -828,6 +879,51 @@ function renderOrderTable(filter){
       <td>${o.date}</td>
       <td><span class="status-pill p-${orderStatusClass[o.status]}"><span class="dot"></span>${orderStatusLabel[o.status]}</span></td>
     </tr>`).join('');
+}
+
+/* ---------- SCHOOL / PARENT ACCESS DEMO ---------- */
+const schoolKids = [
+  {code:'Kind E13', subjects:[
+    {name:'Mathematik', start:54, current:61},
+    {name:'Deutsch', start:72, current:85},
+    {name:'Naturkunde', start:66, current:66},
+  ]},
+  {code:'Kind E07', subjects:[
+    {name:'Mathematik', start:88, current:91},
+    {name:'Deutsch', start:58, current:70},
+    {name:'Naturkunde', start:80, current:84},
+  ]},
+  {code:'Kind E22', subjects:[
+    {name:'Mathematik', start:65, current:70},
+    {name:'Deutsch', start:70, current:74},
+    {name:'Naturkunde', start:50, current:63},
+  ]},
+];
+let schoolSelected = 0;
+function renderSchool(){
+  document.getElementById('schoolKids').innerHTML = schoolKids.map((k,idx)=>
+    `<button class="school-kid-btn ${idx===schoolSelected?'active':''}" onclick="selectSchoolKid(${idx})">${k.code}</button>`
+  ).join('');
+  renderSchoolDetail();
+}
+function selectSchoolKid(idx){
+  schoolSelected = idx;
+  document.querySelectorAll('.school-kid-btn').forEach((b,i)=>b.classList.toggle('active', i===idx));
+  renderSchoolDetail();
+}
+function renderSchoolDetail(){
+  const kid = schoolKids[schoolSelected];
+  document.getElementById('schoolDetail').innerHTML = kid.subjects.map(s=>{
+    const delta = s.current - s.start;
+    const deltaClass = delta>0 ? 'up' : (delta<0 ? 'down' : 'flat');
+    const deltaLabel = delta>0 ? ('+'+delta) : (delta<0 ? delta : '±0');
+    return `
+    <div class="subj-stat-block">
+      <div class="subj-stat-head"><span class="subj-name">${s.name}</span><span class="delta-chip ${deltaClass}">${deltaLabel} Punkte</span></div>
+      <div class="subj-bar-row"><span class="bar-label">Start</span><div class="bar-track"><div class="bar-fill start" style="width:${s.start}%"></div></div><span class="bar-val">${s.start}</span></div>
+      <div class="subj-bar-row"><span class="bar-label">Jetzt</span><div class="bar-track"><div class="bar-fill now" style="width:${s.current}%"></div></div><span class="bar-val">${s.current}</span></div>
+    </div>`;
+  }).join('');
 }
 
 /* ---------- STAFF / VACATION DEMO ---------- */

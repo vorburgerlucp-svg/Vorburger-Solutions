@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vorburger Solutions — Software für Fuhrpark & Controlling</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#12213B;
+  --steel:#3D4C63;
+  --amber:#E8A93B;
+  --sage:#4F7B5C;
+  --paper:#F6F3EC;
+  --ink:#1B1F27;
+  --line:rgba(18,33,59,0.14);
+  --danger:#B5502A;
+  --font-display:'Space Grotesk',sans-serif;
+  --font-body:'IBM Plex Sans',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  line-height:1.5;
+}
+a{color:inherit;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px;}
+
+/* ---- NAV ---- */
+header.topbar{
+  position:sticky;top:0;z-index:50;
+  background:var(--paper);
+  border-bottom:1px solid var(--line);
+}
+.topbar-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 28px;max-width:1120px;margin:0 auto;
+}
+.brand{
+  font-family:var(--font-display);font-weight:700;font-size:1.05rem;
+  letter-spacing:0.01em;display:flex;align-items:center;gap:10px;
+}
+.brand-mark{
+  width:26px;height:26px;border-radius:3px;background:var(--navy);
+  display:flex;align-items:center;justify-content:center;
+}
+.brand-mark span{width:9px;height:9px;background:var(--amber);border-radius:1px;}
+nav.pages{display:flex;gap:6px;background:rgba(18,33,59,0.06);padding:4px;border-radius:999px;}
+nav.pages button{
+  font-family:var(--font-body);font-size:0.9rem;font-weight:500;
+  border:none;background:transparent;padding:8px 18px;border-radius:999px;
+  cursor:pointer;color:var(--steel);transition:all .2s ease;
+}
+nav.pages button.active{background:var(--navy);color:var(--paper);}
+
+/* ---- PAGES ---- */
+.page{display:none;}
+.page.active{display:block;}
+
+/* ---- HERO ---- */
+.hero{
+  padding:72px 0 64px;
+  display:grid;grid-template-columns:1.1fr 1fr;gap:56px;align-items:center;
+}
+.hero-eyebrow{
+  font-family:var(--font-mono);font-size:0.78rem;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--sage);margin-bottom:14px;
+}
+h1{
+  font-family:var(--font-display);font-size:2.6rem;line-height:1.12;
+  margin:0 0 20px;font-weight:600;color:var(--navy);
+}
+h1 em{font-style:normal;color:var(--amber);}
+.hero p.lead{font-size:1.08rem;color:var(--steel);max-width:480px;margin:0 0 28px;}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap;}
+.btn{
+  font-family:var(--font-body);font-weight:600;font-size:0.92rem;
+  padding:13px 22px;border-radius:6px;border:1px solid transparent;
+  cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+  text-decoration:none;transition:transform .15s ease;
+}
+.btn:hover{transform:translateY(-1px);}
+.btn-primary{background:var(--navy);color:var(--paper);}
+.btn-ghost{border-color:var(--navy);color:var(--navy);}
+
+/* ---- LIVE STATUS BOARD (signature element) ---- */
+.board{
+  background:var(--navy);border-radius:10px;padding:22px;color:var(--paper);
+  box-shadow:0 24px 48px -24px rgba(18,33,59,0.45);
+}
+.board-head{
+  display:flex;justify-content:space-between;align-items:baseline;
+  margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(246,243,236,0.14);
+}
+.board-head .title{font-family:var(--font-mono);font-size:0.78rem;letter-spacing:0.06em;text-transform:uppercase;color:rgba(246,243,236,0.6);}
+.board-head .clock{font-family:var(--font-mono);font-size:0.78rem;color:var(--amber);}
+.fleet-row{
+  display:grid;grid-template-columns:18px 1fr auto auto;gap:12px;align-items:center;
+  padding:9px 0;border-bottom:1px solid rgba(246,243,236,0.08);font-size:0.86rem;
+}
+.fleet-row:last-child{border-bottom:none;}
+.dot{width:8px;height:8px;border-radius:50%;}
+.dot.ok{background:#6FCF97;box-shadow:0 0 0 3px rgba(111,207,151,0.18);}
+.dot.warn{background:var(--amber);box-shadow:0 0 0 3px rgba(232,169,59,0.18);}
+.dot.busy{background:#7BA6D9;box-shadow:0 0 0 3px rgba(123,166,217,0.18);}
+.fleet-name{font-weight:500;}
+.fleet-meta{font-family:var(--font-mono);font-size:0.78rem;color:rgba(246,243,236,0.55);}
+.fleet-status{font-family:var(--font-mono);font-size:0.76rem;text-align:right;color:rgba(246,243,236,0.75);}
+.board-foot{
+  margin-top:14px;padding-top:12px;border-top:1px solid rgba(246,243,236,0.14);
+  display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:0.76rem;color:rgba(246,243,236,0.55);
+}
+
+/* ---- SECTION GENERIC ---- */
+section{padding:64px 0;border-top:1px solid var(--line);}
+.section-head{max-width:600px;margin-bottom:40px;}
+.section-eyebrow{font-family:var(--font-mono);font-size:0.76rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--sage);margin-bottom:10px;}
+h2{font-family:var(--font-display);font-size:1.9rem;color:var(--navy);margin:0 0 12px;font-weight:600;}
+.section-head p{color:var(--steel);margin:0;}
+
+/* ---- PROCESS ---- */
+.process{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.process-step{background:var(--paper);padding:26px 22px;}
+.process-step .state{
+  font-family:var(--font-mono);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;
+  color:var(--paper);background:var(--steel);display:inline-block;padding:3px 9px;border-radius:4px;margin-bottom:14px;
+}
+.process-step.open .state{background:var(--sage);}
+.process-step.build .state{background:var(--amber);color:var(--navy);}
+.process-step.live .state{background:var(--navy);}
+.process-step h3{font-family:var(--font-display);font-size:1.05rem;margin:0 0 8px;color:var(--navy);}
+.process-step p{margin:0;font-size:0.88rem;color:var(--steel);}
+
+/* ---- REFERENCE ---- */
+.ref-card{
+  background:var(--navy);color:var(--paper);border-radius:10px;padding:36px 40px;
+  display:grid;grid-template-columns:1fr auto;gap:30px;align-items:center;
+}
+.ref-card h3{font-family:var(--font-display);font-size:1.4rem;margin:0 0 10px;}
+.ref-card p{color:rgba(246,243,236,0.75);margin:0 0 14px;max-width:520px;font-size:0.94rem;}
+.ref-tags{display:flex;gap:8px;flex-wrap:wrap;}
+.ref-tags span{
+  font-family:var(--font-mono);font-size:0.72rem;border:1px solid rgba(246,243,236,0.3);
+  padding:4px 10px;border-radius:999px;color:rgba(246,243,236,0.85);
+}
+.ref-stat{font-family:var(--font-mono);text-align:right;}
+.ref-stat .num{font-size:2.2rem;color:var(--amber);font-weight:600;display:block;}
+.ref-stat .label{font-size:0.74rem;color:rgba(246,243,236,0.6);text-transform:uppercase;letter-spacing:0.05em;}
+
+/* ---- CONTACT ---- */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;}
+.contact-item{padding:20px 0;border-top:1px solid var(--line);}
+.contact-item:first-child{border-top:none;}
+.contact-item .label{font-family:var(--font-mono);font-size:0.74rem;text-transform:uppercase;color:var(--sage);letter-spacing:0.05em;margin-bottom:6px;}
+.contact-item .value{font-size:1.05rem;font-weight:500;color:var(--navy);}
+
+footer{padding:28px 0 40px;font-size:0.8rem;color:var(--steel);}
+
+/* ---- DEMOS PAGE ---- */
+.demo-intro{padding:56px 0 8px;}
+.demo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;padding-bottom:56px;}
+.demo-card{
+  background:#fff;border:1px solid var(--line);border-radius:10px;padding:24px;
+  cursor:pointer;transition:border-color .15s ease;
+}
+.demo-card:hover{border-color:var(--amber);}
+.demo-card .tag{font-family:var(--font-mono);font-size:0.72rem;color:var(--sage);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;display:block;}
+.demo-card h3{font-family:var(--font-display);font-size:1.15rem;margin:0 0 8px;color:var(--navy);}
+.demo-card p{font-size:0.87rem;color:var(--steel);margin:0 0 14px;}
+.demo-card .open-link{font-size:0.84rem;font-weight:600;color:var(--navy);}
+.demo-card.active{border-color:var(--navy);box-shadow:0 6px 20px -10px rgba(18,33,59,0.3);}
+
+.demo-panel{display:none;background:#fff;border:1px solid var(--line);border-radius:10px;padding:32px;margin-bottom:56px;}
+.demo-panel.active{display:block;}
+.demo-panel-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;}
+.demo-panel-head h3{font-family:var(--font-display);font-size:1.3rem;color:var(--navy);margin:0 0 6px;}
+.demo-panel-head p{margin:0;color:var(--steel);font-size:0.9rem;max-width:480px;}
+.close-panel{background:none;border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer;font-size:0.82rem;color:var(--steel);}
+
+/* Fleet demo */
+.filter-row{display:flex;gap:8px;margin-bottom:16px;}
+.filter-row button{
+  font-family:var(--font-mono);font-size:0.76rem;padding:6px 12px;border-radius:999px;
+  border:1px solid var(--line);background:transparent;cursor:pointer;color:var(--steel);
+}
+.filter-row button.active{background:var(--navy);color:var(--paper);border-color:var(--navy);}
+table.demo-table{width:100%;border-collapse:collapse;font-size:0.88rem;}
+table.demo-table th{
+  text-align:left;font-family:var(--font-mono);font-size:0.72rem;text-transform:uppercase;
+  color:var(--sage);letter-spacing:0.05em;padding:8px 10px;border-bottom:1px solid var(--line);
+}
+table.demo-table td{padding:11px 10px;border-bottom:1px solid var(--line);}
+.status-pill{font-family:var(--font-mono);font-size:0.74rem;padding:3px 9px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;}
+.status-pill .dot{width:6px;height:6px;}
+.status-pill.p-ok{background:rgba(111,207,151,0.15);color:#2E6B4A;}
+.status-pill.p-ok .dot{background:#2E6B4A;}
+.status-pill.p-warn{background:rgba(232,169,59,0.16);color:#8A6115;}
+.status-pill.p-warn .dot{background:#8A6115;}
+.status-pill.p-busy{background:rgba(123,166,217,0.16);color:#2E5590;}
+.status-pill.p-busy .dot{background:#2E5590;}
+
+/* Stock demo */
+.stock-search{width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:6px;font-family:var(--font-body);font-size:0.9rem;margin-bottom:16px;}
+.stock-row{display:grid;grid-template-columns:1fr 90px 160px;gap:16px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:0.88rem;}
+.stock-row .qty{font-family:var(--font-mono);text-align:right;}
+.stock-bar-bg{background:var(--line);border-radius:4px;height:8px;overflow:hidden;}
+.stock-bar-fill{height:100%;background:var(--sage);border-radius:4px;}
+.stock-bar-fill.low{background:var(--danger);}
+
+/* Cost demo */
+.cost-chart{display:flex;align-items:flex-end;gap:14px;height:180px;padding:10px 0 0;}
+.cost-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end;}
+.cost-bar{width:100%;max-width:44px;background:var(--navy);border-radius:4px 4px 0 0;transition:height .5s ease;}
+.cost-bar-wrap .month{font-family:var(--font-mono);font-size:0.72rem;color:var(--steel);}
+.cost-legend{display:flex;gap:18px;margin-top:20px;font-family:var(--font-mono);font-size:0.78rem;color:var(--steel);}
+.cost-legend span{display:inline-flex;align-items:center;gap:6px;}
+.cost-legend .sw{width:9px;height:9px;border-radius:2px;}
+
+@media (max-width:820px){
+  .hero{grid-template-columns:1fr;padding:48px 0;}
+  .process{grid-template-columns:1fr;}
+  .demo-grid{grid-template-columns:1fr;}
+  .contact-grid{grid-template-columns:1fr;}
+  .ref-card{grid-template-columns:1fr;text-align:left;}
+  .ref-stat{text-align:left;}
+  h1{font-size:2rem;}
+  .topbar-inner{flex-direction:column;gap:12px;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="brand-mark"><span></span></span> Vorburger Solutions</div>
+    <nav class="pages">
+      <button class="active" data-page="start">Start</button>
+      <button data-page="demos">Demos</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= STARTSEITE ================= -->
+<div class="page active" id="page-start">
+  <div class="wrap">
+    <section class="hero" style="border-top:none;">
+      <div>
+        <div class="hero-eyebrow">Massgeschneiderte Software für kleine &amp; mittlere Betriebe</div>
+        <h1>Ihr Betrieb, <em>ein Programm</em> — statt zehn Excel-Tabellen.</h1>
+        <p class="lead">Ich berate kleinere Betriebe ohne eigene IT-Abteilung und baue das passende Tool dafür — Fuhrpark, Lager, Zeiterfassung, Auftragsplanung oder alles zusammen in einer Software. Kein Standardprodukt, sondern für Ihren Betrieb gebaut.</p>
+        <div class="cta-row">
+          <button class="btn btn-primary" onclick="showPage('demos')">Demos ansehen</button>
+          <a class="btn btn-ghost" href="mailto:vorburgerluc.p@gmail.com">Anfrage stellen</a>
+        </div>
+      </div>
+      <div class="board">
+        <div class="board-head">
+          <div class="title">Fuhrpark · Live-Status</div>
+          <div class="clock" id="liveClock">—</div>
+        </div>
+        <div id="fleetBoard"></div>
+        <div class="board-foot">
+          <span id="boardAvail">— verfügbar</span>
+          <span>Demo-Ansicht</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div class="section-eyebrow">Das Problem</div>
+        <h2>Übersicht entsteht nicht in Excel-Reitern.</h2>
+        <p>Kleinere Betriebe haben selten eine eigene IT-Abteilung — und Standardsoftware passt fast nie genau. Fuhrpark, Lager, Zeiterfassung oder Aufträge laufen über verstreute Tabellen und Zettel. Egal welcher Bereich: Ich baue das Tool, das zu Ihren tatsächlichen Abläufen passt — nicht umgekehrt.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div class="section-eyebrow">So arbeite ich</div>
+        <h2>Vom Gespräch zum Werkzeug, das täglich läuft.</h2>
+      </div>
+      <div class="process">
+        <div class="process-step open"><span class="state">Offen</span><h3>Anfrage</h3><p>Sie schildern das Problem — vor Ort oder per Gespräch. Kein Formular, kein Pflichtenheft.</p></div>
+        <div class="process-step open"><span class="state">Analyse</span><h3>Ist-Zustand</h3><p>Ich schaue mir Ihre heutigen Abläufe an: was wird wo erfasst, was fehlt, was kostet Zeit.</p></div>
+        <div class="process-step build"><span class="state">In Arbeit</span><h3>Prototyp</h3><p>Ein erstes funktionierendes Tool, das Sie testen — nicht nur ein Konzept auf Papier.</p></div>
+        <div class="process-step live"><span class="state">Live</span><h3>Einsatz &amp; Support</h3><p>Das Tool läuft im Betrieb. Ich passe es weiter an, wenn sich Abläufe ändern.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div class="section-eyebrow">Und darüber hinaus</div>
+        <h2>Fuhrpark ist nur der Anfang der Liste.</h2>
+        <p>Aus der Ausbildung zum Technischen Kaufmann bringe ich das betriebswirtschaftliche Rüstzeug mit, um Software für praktisch jeden Bereich Ihres Betriebs zu entwickeln:</p>
+      </div>
+      <div class="ref-tags" style="margin-top:-8px;">
+        <span style="border-color:var(--line);color:var(--steel);">Datensammlung mit automatischer Auswertung</span>
+        <span style="border-color:var(--line);color:var(--steel);">Soll-Ist-Vergleich / Controlling</span>
+        <span style="border-color:var(--line);color:var(--steel);">Bestellrhythmus-Verfahren</span>
+        <span style="border-color:var(--line);color:var(--steel);">Lean Management</span>
+        <span style="border-color:var(--line);color:var(--steel);">Rechnungserstellung</span>
+        <span style="border-color:var(--line);color:var(--steel);">Automatisierung von Arbeitsprozessen</span>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div class="section-eyebrow">Bereits im Einsatz</div>
+        <h2>Kein Konzept — ein laufendes Beispiel.</h2>
+      </div>
+      <div class="ref-card">
+        <div>
+          <h3>LagerTool</h3>
+          <p>Lager- und Einsatzplanungs-Tool für Monteure: Bestellwesen, Wochenplanung, Verrechnung und Lagerbestand in einer einzigen Web-App — täglich im Einsatz, seit Version 1 kontinuierlich gewachsen. Ein Beispiel dafür, wie mehrere Bereiche in einem Programm zusammenlaufen können.</p>
+          <div class="ref-tags">
+            <span>Bestellwesen</span><span>Wochenplanung</span><span>Verrechnung</span><span>Rollen &amp; Rechte</span>
+          </div>
+        </div>
+        <div class="ref-stat">
+          <span class="num">69+</span>
+          <span class="label">Versionen im Einsatz</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div class="section-eyebrow">Kontakt</div>
+        <h2>Ein Gespräch reicht als Anfang.</h2>
+      </div>
+      <div class="contact-grid">
+        <div>
+          <div class="contact-item"><div class="label">E-Mail</div><div class="value">vorburgerluc.p@gmail.com</div></div>
+          <div class="contact-item"><div class="label">Telefon</div><div class="value">+41 79 294 12 22</div></div>
+        </div>
+        <div>
+          <div class="contact-item"><div class="label">Hintergrund</div><div class="value">Vom Handwerk in die IT — Schreiner EFZ, Jahre in Montage &amp; Projektleitung, heute Softwareentwicklung. Beide Welten aus eigener Erfahrung.</div></div>
+          <div class="contact-item"><div class="label">Einsatzgebiet</div><div class="value">Region spielt keine Rolle — Einsätze über die ganze DACH-Region hinweg möglich.</div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <footer><div class="wrap">© 2026 Vorburger Solutions — Beratung &amp; Entwicklung für Fuhrpark- und Controlling-Software.</div></footer>
+</div>
+
+<!-- ================= DEMOSEITE ================= -->
+<div class="page" id="page-demos">
+  <div class="wrap">
+    <section class="demo-intro" style="border-top:none;padding-bottom:0;">
+      <div class="section-head">
+        <div class="section-eyebrow">Beispiele</div>
+        <h2>Ein paar Ausschnitte davon, was möglich ist.</h2>
+        <p>Fuhrpark, Lager, Aufträge, Zeiterfassung — diese Beispiele stehen für viele weitere Bereiche. Jede Karte öffnet einen funktionierenden Ausschnitt, kein Mockup-Bild, sondern bedienbare Demo-Bausteine, wie sie später ins echte Tool einfliessen. Am Ende entsteht oft ein einziges Programm für mehrere Bereiche gleichzeitig.</p>
+      </div>
+    </section>
+
+    <section style="border-top:none;padding-top:24px;">
+      <div class="demo-grid">
+        <div class="demo-card" data-demo="fleet">
+          <span class="tag">Fuhrpark</span>
+          <h3>Status-Board</h3>
+          <p>Alle Fahrzeuge auf einen Blick: verfügbar, im Einsatz, in der Werkstatt.</p>
+          <span class="open-link">Demo öffnen →</span>
+        </div>
+        <div class="demo-card" data-demo="stock">
+          <span class="tag">Lager &amp; Bestand</span>
+          <h3>Bestandsübersicht</h3>
+          <p>Bestände mit Suchfunktion und automatischer Tiefstand-Markierung.</p>
+          <span class="open-link">Demo öffnen →</span>
+        </div>
+        <div class="demo-card" data-demo="cost">
+          <span class="tag">Controlling</span>
+          <h3>Kosten pro Monat</h3>
+          <p>Unterhaltskosten im Jahresverlauf, sofort erkennbar statt versteckt im Beleg-Ordner.</p>
+          <span class="open-link">Demo öffnen →</span>
+        </div>
+        <div class="demo-card" data-demo="orders">
+          <span class="tag">Auftragsverwaltung</span>
+          <h3>Aufträge im Überblick</h3>
+          <p>Vom Eingang bis zum Abschluss — jeder Auftrag an einem Ort, egal in welcher Branche.</p>
+          <span class="open-link">Demo öffnen →</span>
+        </div>
+      </div>
+
+      <!-- FLEET PANEL -->
+      <div class="demo-panel" id="panel-fleet">
+        <div class="demo-panel-head">
+          <div>
+            <h3>Fuhrpark Status-Board</h3>
+            <p>Filtern Sie nach Status — genau wie später im echten Tool.</p>
+          </div>
+          <button class="close-panel" onclick="closePanel('fleet')">Schliessen</button>
+        </div>
+        <div class="filter-row">
+          <button class="fleet-filter active" data-filter="all">Alle</button>
+          <button class="fleet-filter" data-filter="ok">Verfügbar</button>
+          <button class="fleet-filter" data-filter="busy">Im Einsatz</button>
+          <button class="fleet-filter" data-filter="warn">Werkstatt</button>
+        </div>
+        <table class="demo-table">
+          <thead><tr><th>Fahrzeug</th><th>Km-Stand</th><th>Nächster Service</th><th>Status</th></tr></thead>
+          <tbody id="fleetTableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- STOCK PANEL -->
+      <div class="demo-panel" id="panel-stock">
+        <div class="demo-panel-head">
+          <div>
+            <h3>Bestandsübersicht</h3>
+            <p>Suchen Sie einen Artikel — Tiefstände werden automatisch rot markiert.</p>
+          </div>
+          <button class="close-panel" onclick="closePanel('stock')">Schliessen</button>
+        </div>
+        <input class="stock-search" id="stockSearch" placeholder="Artikel suchen …" oninput="renderStock()">
+        <div id="stockList"></div>
+      </div>
+
+      <!-- COST PANEL -->
+      <div class="demo-panel" id="panel-cost">
+        <div class="demo-panel-head">
+          <div>
+            <h3>Kosten-Controlling</h3>
+            <p>Unterhaltskosten der letzten sechs Monate, nach Kategorie.</p>
+          </div>
+          <button class="close-panel" onclick="closePanel('cost')">Schliessen</button>
+        </div>
+        <div class="cost-chart" id="costChart"></div>
+        <div class="cost-legend">
+          <span><span class="sw" style="background:var(--navy);"></span>Total pro Monat (CHF)</span>
+        </div>
+      </div>
+
+      <!-- ORDERS PANEL -->
+      <div class="demo-panel" id="panel-orders">
+        <div class="demo-panel-head">
+          <div>
+            <h3>Aufträge im Überblick</h3>
+            <p>Filtern Sie nach Auftragsstatus — dasselbe Prinzip funktioniert für jede Branche.</p>
+          </div>
+          <button class="close-panel" onclick="closePanel('orders')">Schliessen</button>
+        </div>
+        <div class="filter-row">
+          <button class="order-filter active" data-filter="all">Alle</button>
+          <button class="order-filter" data-filter="open">Offen</button>
+          <button class="order-filter" data-filter="progress">In Arbeit</button>
+          <button class="order-filter" data-filter="done">Abgeschlossen</button>
+        </div>
+        <table class="demo-table">
+          <thead><tr><th>Auftrag</th><th>Kunde</th><th>Termin</th><th>Status</th></tr></thead>
+          <tbody id="orderTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+  <footer><div class="wrap">© 2026 Vorburger Solutions — Beratung &amp; Entwicklung für Fuhrpark- und Controlling-Software.</div></footer>
+</div>
+
+<script>
+/* ---------- NAV ---------- */
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('nav.pages button').forEach(b=>b.classList.toggle('active', b.dataset.page===name));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('nav.pages button').forEach(b=>{
+  b.addEventListener('click',()=>showPage(b.dataset.page));
+});
+
+/* ---------- HERO LIVE BOARD ---------- */
+const fleetData = [
+  {name:'VW Crafter 1', km:'128 400', status:'ok', label:'Verfügbar'},
+  {name:'VW Crafter 2', km:'96 200', status:'busy', label:'Im Einsatz — Baustelle Muttenz'},
+  {name:'Mercedes Sprinter', km:'154 800', status:'warn', label:'Werkstatt — Service fällig'},
+  {name:'Iveco Daily', km:'71 050', status:'ok', label:'Verfügbar'},
+  {name:'VW Crafter 3', km:'110 300', status:'busy', label:'Im Einsatz — Baustelle Liestal'},
+];
+function renderBoard(){
+  const el = document.getElementById('fleetBoard');
+  el.innerHTML = fleetData.map(f=>`
+    <div class="fleet-row">
+      <span class="dot ${f.status}"></span>
+      <span class="fleet-name">${f.name}</span>
+      <span class="fleet-meta">${f.km} km</span>
+      <span class="fleet-status">${f.label}</span>
+    </div>`).join('');
+  const avail = fleetData.filter(f=>f.status==='ok').length;
+  document.getElementById('boardAvail').textContent = avail + ' von ' + fleetData.length + ' verfügbar';
+}
+renderBoard();
+function tickClock(){
+  const now = new Date();
+  document.getElementById('liveClock').textContent = now.toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+tickClock();
+setInterval(tickClock, 1000);
+
+/* ---------- DEMO CARDS ---------- */
+document.querySelectorAll('.demo-card').forEach(card=>{
+  card.addEventListener('click', ()=>openPanel(card.dataset.demo));
+});
+function openPanel(name){
+  document.querySelectorAll('.demo-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.demo-card').forEach(c=>c.classList.toggle('active', c.dataset.demo===name));
+  document.getElementById('panel-'+name).classList.add('active');
+  if(name==='fleet') renderFleetTable('all');
+  if(name==='stock') renderStock();
+  if(name==='cost') renderCost();
+  if(name==='orders') renderOrderTable('all');
+  document.getElementById('panel-'+name).scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+function closePanel(name){
+  document.getElementById('panel-'+name).classList.remove('active');
+  document.querySelector('.demo-card[data-demo="'+name+'"]').classList.remove('active');
+}
+
+/* ---------- FLEET TABLE DEMO ---------- */
+const fleetFull = [
+  {name:'VW Crafter 1', km:'128 400', service:'12.09.2026', status:'ok'},
+  {name:'VW Crafter 2', km:'96 200', service:'03.11.2026', status:'busy'},
+  {name:'Mercedes Sprinter', km:'154 800', service:'überfällig', status:'warn'},
+  {name:'Iveco Daily', km:'71 050', service:'20.01.2027', status:'ok'},
+  {name:'VW Crafter 3', km:'110 300', service:'08.10.2026', status:'busy'},
+  {name:'Renault Master', km:'142 900', service:'25.08.2026', status:'warn'},
+];
+const statusLabel = {ok:'Verfügbar', busy:'Im Einsatz', warn:'Werkstatt'};
+document.querySelectorAll('.fleet-filter').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.fleet-filter').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderFleetTable(btn.dataset.filter);
+  });
+});
+function renderFleetTable(filter){
+  const rows = fleetFull.filter(f=> filter==='all' || f.status===filter);
+  document.getElementById('fleetTableBody').innerHTML = rows.map(f=>`
+    <tr>
+      <td>${f.name}</td>
+      <td>${f.km} km</td>
+      <td>${f.service}</td>
+      <td><span class="status-pill p-${f.status}"><span class="dot"></span>${statusLabel[f.status]}</span></td>
+    </tr>`).join('');
+}
+
+/* ---------- ORDERS DEMO ---------- */
+const orderData = [
+  {name:'Küchenmontage', customer:'Fam. Roth', date:'22.07.2026', status:'open'},
+  {name:'Bürorenovation', customer:'Treuhand Weber AG', date:'25.07.2026', status:'progress'},
+  {name:'Fenster ersetzen', customer:'Fam. Blaser', date:'18.07.2026', status:'done'},
+  {name:'Ladeneinrichtung', customer:'Bäckerei Sutter', date:'30.07.2026', status:'progress'},
+  {name:'Terrassenüberdachung', customer:'Fam. Núñez', date:'05.08.2026', status:'open'},
+];
+const orderStatusLabel = {open:'Offen', progress:'In Arbeit', done:'Abgeschlossen'};
+const orderStatusClass = {open:'warn', progress:'busy', done:'ok'};
+document.querySelectorAll('.order-filter').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.order-filter').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderOrderTable(btn.dataset.filter);
+  });
+});
+function renderOrderTable(filter){
+  const rows = orderData.filter(o=> filter==='all' || o.status===filter);
+  document.getElementById('orderTableBody').innerHTML = rows.map(o=>`
+    <tr>
+      <td>${o.name}</td>
+      <td>${o.customer}</td>
+      <td>${o.date}</td>
+      <td><span class="status-pill p-${orderStatusClass[o.status]}"><span class="dot"></span>${orderStatusLabel[o.status]}</span></td>
+    </tr>`).join('');
+}
+
+/* ---------- STOCK DEMO ---------- */
+const stockData = [
+  {name:'Dübel 8mm (Karton)', qty:340, max:500},
+  {name:'Schrauben 4x40mm', qty:62, max:800},
+  {name:'Silikon transparent', qty:14, max:200},
+  {name:'Handschuhe Gr. L', qty:180, max:300},
+  {name:'Montageschaum', qty:9, max:150},
+  {name:'Kabelbinder 300mm', qty:410, max:600},
+];
+function renderStock(){
+  const q = (document.getElementById('stockSearch').value || '').toLowerCase();
+  const rows = stockData.filter(s=>s.name.toLowerCase().includes(q));
+  document.getElementById('stockList').innerHTML = rows.map(s=>{
+    const pct = Math.min(100, Math.round((s.qty/s.max)*100));
+    const low = pct < 15;
+    return `<div class="stock-row">
+      <span>${s.name}</span>
+      <span class="qty">${s.qty} Stk.</span>
+      <div class="stock-bar-bg"><div class="stock-bar-fill ${low?'low':''}" style="width:${pct}%;"></div></div>
+    </div>`;
+  }).join('') || '<p style="color:var(--steel);font-size:0.88rem;">Kein Artikel gefunden.</p>';
+}
+
+/* ---------- COST DEMO ---------- */
+const costData = [
+  {month:'Feb', val:4200},{month:'Mär', val:5100},{month:'Apr', val:3800},
+  {month:'Mai', val:6400},{month:'Jun', val:4700},{month:'Jul', val:5900},
+];
+function renderCost(){
+  const max = Math.max(...costData.map(c=>c.val));
+  document.getElementById('costChart').innerHTML = costData.map(c=>{
+    const h = Math.round((c.val/max)*100);
+    return `<div class="cost-bar-wrap">
+      <div class="cost-bar" style="height:${h}%;" title="CHF ${c.val}"></div>
+      <span class="month">${c.month}</span>
+    </div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>

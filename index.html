@@ -7680,11 +7680,14 @@ function parseWochenplanExcel(rows) {
         eingetragen++;
       } else {
         // Baustelle suchen. Nie automatisch anlegen.
-        const bs = (state.baustellen||[]).find(b =>
-          (b.name||'').toLowerCase() === zelleLC ||
-          (b.name||'').toLowerCase().includes(zelleLC) ||
-          zelleLC.includes((b.name||'').toLowerCase())
-        );
+        const bs = (state.baustellen||[]).find(b => {
+          const nameLC = (b.name||'').toLowerCase();
+          const aliasTreffer = (b.excelAliases||[]).some(a => wpSucheNorm(a) === wpSucheNorm(zelle));
+          return aliasTreffer ||
+            nameLC === zelleLC ||
+            nameLC.includes(zelleLC) ||
+            zelleLC.includes(nameLC);
+        });
         if (!bs) {
           // Originalbezeichnung aus Excel sichtbar im Wochenplan behalten.
           state.plan[datum]['status_ma' + ma.id] = {

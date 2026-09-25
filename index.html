@@ -6443,6 +6443,11 @@ function wpSucheNorm(t) {
   return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/ß/g,'ss').toLowerCase().replace(/\s+/g,' ').trim();
 }
+function wpEsc(t) {
+  return String(t??'').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
 
 function renderWochenplan() {
   wpInit();
@@ -6625,12 +6630,19 @@ function renderWochenplan() {
             +'</td>';
         } else if(statusE?.status){
           const sHex=statusE.farbeHex||statusHex(statusE.status), sTc=textCol(sHex);
+          const istUngeklaert = statusE.status === 'Baustelle ungeklärt';
+          const originalExcelName = istUngeklaert
+            ? String(statusE.notiz||'').replace(/^Baustelle ungeklärt:\s*/i,'').trim()
+            : '';
+          const statusLabel = wpEsc((istUngeklaert && originalExcelName) ? originalExcelName : statusE.status);
+          const statusTitle = istUngeklaert ? ' title="Keine angelegte Baustelle vorhanden"' : '';
           html+='<td style="'+bg+'padding:2px">'
             +'<div class="wp-cell" draggable="true" '
             +'data-key="status_ma'+m.id+'" data-ds="'+ds+'" data-ma="'+m.id+'" data-bs="0" '
+            +statusTitle+' '
             +'style="background:'+sHex+';color:'+sTc+';font-size:11px;min-height:28px;justify-content:center" '
             +'onclick="wpMaCellClick('+maIdAttr(m.id)+',\''+ds+'\')">'
-            +statusE.status+'</div></td>';
+            +statusLabel+'</div></td>';
         } else {
           html+='<td style="'+bg+'padding:2px">'
             +'<div class="wp-cell leer" '
@@ -7620,7 +7632,7 @@ function parseWochenplanExcel(rows) {
   const statusWerte = ['urlaub','krank','frei','nbu','info folgt','bu','unentschuldigt','büro','ferien','urlaub termin'];
   let eingetragen = 0;
   let nichtGefunden = [];
-  const neueBaustellen = new Set();
+  const ungeklaerteBaustellen = new Set();
 
   for (let r = headerIdx + 1; r < rows.length; r++) {
     const row = rows[r];
@@ -7667,17 +7679,31 @@ function parseWochenplanExcel(rows) {
         };
         eingetragen++;
       } else {
-        // Baustelle suchen oder anlegen
-        let bs = (state.baustellen||[]).find(b =>
-          b.name.toLowerCase() === zelleLC ||
-          b.name.toLowerCase().includes(zelleLC) ||
-          zelleLC.includes(b.name.toLowerCase())
+        // Baustelle suchen. Nie automatisch anlegen.
+        const bs = (state.baustellen||[]).find(b =>
+          (b.name||'').toLowerCase() === zelleLC ||
+          (b.name||'').toLowerCase().includes(zelleLC) ||
+          zelleLC.includes((b.name||'').toLowerCase())
         );
         if (!bs) {
-          bs = { id: Date.now() + Math.floor(Math.random()*10000), name: zelle, farbe: randomColor() };
-          if (!state.baustellen) state.baustellen = [];
-          state.baustellen.push(bs);
-          neueBaustellen.add(zelle);
+          // Originalbezeichnung aus Excel sichtbar im Wochenplan behalten.
+          state.plan[datum]['status_ma' + ma.id] = {
+            maId: ma.id,
+            status: 'Baustelle ungeklärt',
+            farbeHex: '#b86f00',
+            notiz: 'Baustelle ungeklärt: ' + zelle
+          };
+          const todoKey = 'excel-site-missing:' + wpSucheNorm(zelle);
+          todoErstellen({
+            text: 'Baustelle ' + zelle + ' – keine angelegte Baustelle vorhanden',
+            notiz: 'Aus Excel-Wochenplan am ' + datum + '. Baustelle zuerst anlegen oder eindeutig mit einer bestehenden Baustelle verknüpfen.',
+            zustaendig: 'Luc',
+            quelle: 'Excel-Sync',
+            kind: 'excel_sync_unresolved_site'
+          }, { schluessel: todoKey, ausdruecklich: true });
+          ungeklaerteBaustellen.add(zelle);
+          eingetragen++;
+          return;
         }
         state.plan[datum]['ma' + ma.id + '_' + datum] = {
           maId: ma.id, bsId: bs.id, farbeHex: getHex(bs), notiz: ''
@@ -7691,7 +7717,7 @@ function parseWochenplanExcel(rows) {
   renderWochenplan();
 
   let msg = eingetragen + ' Einträge importiert';
-  if (neueBaustellen.size) msg += ', ' + neueBaustellen.size + ' neue Baustellen angelegt';
+  if (ungeklaerteBaustellen.size) msg += ', ' + ungeklaerteBaustellen.size + ' Baustelle(n) nicht angelegt → To-do erstellt';
   if (nichtGefunden.length) msg += '. Nicht gefunden: ' + nichtGefunden.join(', ');
   toast('Excel Import', msg, eingetragen > 0 ? '✅' : '⚠️');
 }
